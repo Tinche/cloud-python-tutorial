@@ -1,0 +1,8 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: cloud-python
+spec:
+  backend:
+    serviceName: cloud-python
+    servicePort: 8000

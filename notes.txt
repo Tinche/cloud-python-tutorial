@@ -1,0 +1,118 @@
+* create virtualenv
+* install django
+* create project
+* run migrations
+
+* developing with runserver
+
+* putting it into production
+    - https://docs.djangoproject.com/en/2.0/howto/deployment/
+    - (mod_wsgi??)
+
+* modifying the settings
+  - SECRET_KEY
+  - DEBUG = False
+  - use a different DB
+  - modifying ALLOWED_HOSTS
+  - static files (whitenoise?)
+
+- use both environment variables and a different settings file
+- use gunicorn or uwsgi
+
+* drawbacks
+  - managing virtualenvs remotely?
+
+* Let's talk about Docker
+
+* Docker is:
+  - a daemon process that builds and runs Docker images
+  - a file format and an image format
+  - a company
+
+* Docker Images
+  - can contain basically anything
+  - should be immutable
+  - need to be pushed to Docker Repositories
+
+docker build -t tinche/cloud-python .
+
+docker run --rm -ti \
+    -e DJANGO_SETTINGS_MODULE=cloud.settings_prod \
+    -e DB_HOST=localhost \
+    -e DB_PORT=5432 \
+    -e DB_USER=postgres \
+    -e DB_PASSWORD= \
+    --net host \
+    tinche/cloud-python runserver
+
+docker run -d --restart always \
+    -e DJANGO_SETTINGS_MODULE=cloud.settings_prod \
+    -e DB_HOST=localhost \
+    -e DB_PORT=5432 \
+    -e DB_USER=postgres \
+    -e DB_PASSWORD= \
+    --net host \
+    --entrypoint .venv/bin/gunicorn \
+    tinche/cloud-python cloud.wsgi:application
+
+* Docker containers are not VMs
+
+* Kubernetes
+    - the missing piece of the puzzle
+    - cluster scheduler
+    - turns virtual machines into cpu cores and RAM
+
+* Basically won the Scheduler Wars
+    - Docker Swarm
+    - Apache Mesos
+    - Hashicorp Nomad
+
+* master nodes and worker nodes
+
+* provides an API and cloud primitives
+
+* interact with the API using kubectl
+  - kubectl proxy
+
+* primitives:
+    - deployment - pods - containers
+    - services
+    - ingresses
+    - configmaps, secrets
+    - namespaces, cron jobs, stateful sets, daemon sets
+    - persistent volumes, persistent volume claims, limit ranges
+    - roles
+    - events, autoscalers
+
+* deploying the cloud app
+    - deployment, secret
+    - service
+    - ingress
+
+* using the GKE
+    - free master
+    - free tier
+    - $300 for a year
+
+* create a Google Cloud project
+* create a Kubernetes cluster
+* provision a Postgres database
+* push the image
+
+docker tag tinche/cloud-python gcr.io/url-shortener-189609/tinche/cloud-python
+gcloud docker -- push gcr.io/url-shortener-189609/tinche/cloud-python
+
+* run the initial migrations
+ - whitelist my ip
+ - docker run --rm -ti -e DJANGO_SETTINGS_MODULE=cloud.settings_prod -e DB_HOST=35.224.221.183 -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=postgres tinche/cloud-python migrate
+ - docker run --rm -ti -e DJANGO_SETTINGS_MODULE=cloud.settings_prod -e DB_HOST=35.224.221.183 -e DB_PORT=5432 -e DB_USER=postgres -e DB_PASSWORD=postgres tinche/cloud-python createsuperuser
+
+* create the deployment
+* create the service
+* create the ingress
+
+* deploy the Kubernetes dashboard
+* debug stuff with kubectl run -it --rm --restart=Never busybox --image=busybox sh
+* debug pods with kubectl exec <POD-NAME> -c <CONTAINER-NAME> -- <COMMAND>
+
+docker run -d -p 5432:5432 postgres
