@@ -19,7 +19,7 @@ spec:
         image: gcr.io/url-shortener-189609/tinche/cloud-python
         ports:
         - containerPort: 8000
-        command: [".venv/bin/gunicorn", "cloud.wsgi:application", "-b", "0.0.0.0"]
+        args: ["runbjoern"]
         env:
           - name: DB_HOST
             value: "127.0.0.1"
