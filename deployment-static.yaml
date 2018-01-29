@@ -1,0 +1,28 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: cloud-python-static
+  labels:
+    app: cloud-python
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cloud-python-static
+  template:
+    metadata:
+      labels:
+        app: cloud-python-static
+    spec:
+      containers:
+      - name: cloud-python-static
+        image: gcr.io/url-shortener-189609/tinche/cloud-python-static
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        resources:
+          requests:
+            cpu: "10m"

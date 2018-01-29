@@ -1,0 +1,12 @@
+FROM python:3.6-slim as builder
+
+WORKDIR /app
+RUN python -m venv .venv
+COPY requirements.txt requirements.txt
+RUN .venv/bin/pip install -r requirements.txt
+COPY cloud cloud
+COPY manage.py manage.py
+RUN .venv/bin/python manage.py collectstatic
+
+FROM nginx:latest
+COPY --from=builder /app/static /usr/share/nginx/html/static
